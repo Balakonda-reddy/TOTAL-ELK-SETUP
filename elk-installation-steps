@@ -153,7 +153,34 @@ output {
        manage_template => false
    }
 }
+---------
 
+input {
+  file {
+    path => "/opt/tomcat/logs/localhost_access_log.*.txt"
+    type => "syslog"
+  }
+
+}
+
+filter {
+  if [type] == "tomcat-access" {
+    grok {
+      match => [ "message", "%{COMBINEDAPACHELOG}" ]
+    }
+  }
+}
+
+output {
+   elasticsearch {
+       hosts => ["172.31.1.19:9200"]
+       #user => "elastic"
+       #password => "elastic123"
+       index => "tomcat-1"
+       manage_template => false
+   }
+}
+---------------
 2) go to /usr/share/logstash location and run 
  
  /bin/logstash -f /etc/logstash/conf.d/apache.conf
